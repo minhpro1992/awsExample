@@ -1,3 +1,7 @@
 node_modules
-.build
+.build/
 .serverless
+.vscode/
+yarn-error.log
+.build/handler.js
+.build/handler.js.map

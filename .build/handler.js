@@ -38,7 +38,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getS3PresignedURL = exports.getS3PostPresignedUploadFile = exports.hello = void 0;
 var bucket_type_1 = require("./enums/bucket-type");
-var s3_client_1 = require("./s3/s3-client");
+var services_1 = require("./services");
+var apiResult = function (_a) {
+    var statusCode = _a.statusCode, body = _a.body;
+    return {
+        statusCode: statusCode,
+        headers: {
+            'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify(body)
+    };
+};
 var hello = function (event) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         return [2 /*return*/, {
@@ -52,42 +62,39 @@ var hello = function (event) { return __awaiter(void 0, void 0, void 0, function
 }); };
 exports.hello = hello;
 var getS3PostPresignedUploadFile = function (event) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, bucketType, fileName, bucketName, params, uploadUrl;
+    var _a, bucketType, fileName, bucketName, uploadUrl;
     var _b;
     return __generator(this, function (_c) {
         _a = event.queryStringParameters, bucketType = _a.bucketType, fileName = _a.fileName;
-        console.log("query value: ", bucketType, fileName);
         bucketName = (_b = bucket_type_1.default.fromType(bucketType)) === null || _b === void 0 ? void 0 : _b.bucketName;
         try {
-            if (bucketName && fileName) {
-                params = {
-                    Bucket: bucketName,
-                    Fields: {
-                        key: fileName,
-                    },
-                };
-                uploadUrl = s3_client_1.getS3Client().createPresignedPost(params);
-                return [2 /*return*/, {
-                        statusCode: 200,
-                        body: uploadUrl,
-                    }];
-            }
-            else {
-                return [2 /*return*/, {
+            uploadUrl = services_1.s3Service.getS3PostPresignedUploadFile({
+                bucketName: bucketName,
+                fileName: fileName,
+            });
+            if (!uploadUrl) {
+                return [2 /*return*/, apiResult({
                         statusCode: 400,
                         body: "Invalid bucket type or file name",
-                    }];
+                    })];
             }
+            return [2 /*return*/, apiResult({
+                    statusCode: 200,
+                    body: uploadUrl,
+                })];
         }
         catch (error) {
             return [2 /*return*/, handleError(error)];
+        }
+        finally {
+            // Log.debug("Finished-getS3PostPresignedUploadFile");
         }
         return [2 /*return*/];
     });
 }); };
 exports.getS3PostPresignedUploadFile = getS3PostPresignedUploadFile;
 var getS3PresignedURL = function (event) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, bucketType, fileName, bucketName, params, s3Url, error_1;
+    var _a, bucketType, fileName, bucketName, s3Url, error_1;
     var _b;
     return __generator(this, function (_c) {
         switch (_c.label) {
@@ -96,36 +103,37 @@ var getS3PresignedURL = function (event) { return __awaiter(void 0, void 0, void
                 bucketName = (_b = bucket_type_1.default.fromType(bucketType)) === null || _b === void 0 ? void 0 : _b.bucketName;
                 _c.label = 1;
             case 1:
-                _c.trys.push([1, 5, , 6]);
-                if (!(bucketName && fileName)) return [3 /*break*/, 3];
-                params = {
-                    Bucket: bucketName,
-                    Key: fileName,
-                };
-                return [4 /*yield*/, s3_client_1.getS3Client().getSignedUrlPromise("getObject", params)];
+                _c.trys.push([1, 3, 4, 5]);
+                return [4 /*yield*/, services_1.s3Service.getS3PresignedURL({
+                        bucketName: bucketName,
+                        fileName: fileName,
+                    })];
             case 2:
                 s3Url = _c.sent();
-                console.log("s3Url: ", s3Url);
-                return [2 /*return*/, {
+                console.log(bucketName, fileName, s3Url);
+                if (!s3Url) {
+                    return [2 /*return*/, apiResult({
+                            statusCode: 400,
+                            body: "Invalid bucket type or file name",
+                        })];
+                }
+                return [2 /*return*/, apiResult({
                         statusCode: 200,
                         body: s3Url,
-                    }];
-            case 3: return [2 /*return*/, {
-                    statusCode: 400,
-                    body: "Invalid bucket type or file name",
-                }];
-            case 4: return [3 /*break*/, 6];
-            case 5:
+                    })];
+            case 3:
                 error_1 = _c.sent();
                 return [2 /*return*/, handleError(error_1)];
-            case 6: return [2 /*return*/];
+            case 4: return [7 /*endfinally*/];
+            case 5: return [2 /*return*/];
         }
     });
 }); };
 exports.getS3PresignedURL = getS3PresignedURL;
 var handleError = function (error) {
-    return apiResult(error["statusCode"] || 500, {
-        message: error.message || "unknown error",
-    });
+    // Log.error(error.message || "error: ", error);
+    return apiResult({ statusCode: error["statusCode"] || 500, body: {
+            message: error.message || "unknown error",
+        } });
 };
 //# sourceMappingURL=handler.js.map
