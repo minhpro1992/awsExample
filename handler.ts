@@ -1,5 +1,4 @@
 import BucketType from "./enums/bucket-type";
-import { getS3Client } from "./s3/s3-client";
 import _ from "lodash";
 // import Log from "@dazn/lambda-powertools-logger";
 import {
