@@ -7,7 +7,7 @@ var BucketType = /** @class */ (function () {
         this.contentType = contentType;
         this.sizeRange = sizeRange;
     }
-    BucketType.BUCKET_IMAGE = new BucketType(0, 'uploadfilename', 'image/', [0, 10]);
+    BucketType.BUCKET_IMAGE = new BucketType(0, process.env.BUCKET_NAME, 'image/', [0, 10]);
     BucketType.ALL_BUCKETS = [
         BucketType.BUCKET_IMAGE
     ];

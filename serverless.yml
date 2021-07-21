@@ -26,10 +26,15 @@ provider:
   lambdaHashingVersion: 20201221
   stage: dev
   region: ap-southeast-1
+  environment:
+    PLAYER_POINTS_TABLE: ${self:custom.DYNAMODB.TableName}
+    BUCKET_NAME: ${self:custom.S3.BUCKET_NAME}
 plugins:
   - serverless-plugin-typescript
   - serverless-offline
 custom:
+  DYNAMODB:
+    TableName: 'player-points'
   S3:
     BUCKET_NAME: 'uploadfilename'
 # you can overwrite defaults here
@@ -85,6 +90,15 @@ functions:
           cors:
             origin: ${env:CORS_ORIGIN, '*'}
             maxAge: 3600
+  getPoints:
+    handler: handler.getPoints
+    events:
+      - httpApi:
+        method: get
+        path: /players-points/{ID}
+        cors:
+          origin: ${env:CORS_ORIGIN, '*'}
+          maxAge: 3600
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details

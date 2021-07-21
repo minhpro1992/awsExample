@@ -1,7 +1,7 @@
 class BucketType {
     public static readonly BUCKET_IMAGE = new BucketType(
         0,
-        'uploadfilename',
+        process.env.BUCKET_NAME,
         'image/',
         [0,10]
     )

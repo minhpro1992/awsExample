@@ -8,7 +8,8 @@ import {
   S3Event,
   APIGatewayProxyResult,
 } from "aws-lambda";
-import { s3Service } from "./services";
+import { dynamoDBService, s3Service } from "./services";
+import { GetItemInput } from "aws-sdk/clients/dynamodb";
 const apiResult = ({statusCode, body} : {statusCode: number, body: unknown}) => {
   return {
     statusCode,
@@ -92,6 +93,26 @@ export const getS3PresignedURL: Handler = async (
     // Log.debug("Finished-getS3PresignedURL");
   }
 };
+
+export const getPoints: Handler = async (event: APIGatewayProxyEvent) => {
+  try {
+    const PLAYER_POINTS_TABLE = process.env.PLAYER_POINTS_TABLE
+    const playerPointsID = event.pathParameters.ID
+    const params = {
+      TableName: PLAYER_POINTS_TABLE,
+      Key: {
+        ID: playerPointsID
+      }
+    }
+    const results = await dynamoDBService.getPoints(params as GetItemInput)
+    return apiResult({
+      statusCode: 200,
+      body: results
+    })
+  } catch (error) {
+    return handleError(error)
+  }
+}
 
 const handleError = (error: Error) => {
   // Log.error(error.message || "error: ", error);

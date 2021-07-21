@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getS3PresignedURL = exports.getS3PostPresignedUploadFile = exports.hello = void 0;
+exports.getPoints = exports.getS3PresignedURL = exports.getS3PostPresignedUploadFile = exports.hello = void 0;
 var bucket_type_1 = require("./enums/bucket-type");
 var services_1 = require("./services");
 var apiResult = function (_a) {
@@ -130,6 +130,35 @@ var getS3PresignedURL = function (event) { return __awaiter(void 0, void 0, void
     });
 }); };
 exports.getS3PresignedURL = getS3PresignedURL;
+var getPoints = function (event) { return __awaiter(void 0, void 0, void 0, function () {
+    var PLAYER_POINTS_TABLE, playerPointsID, params, results, error_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                PLAYER_POINTS_TABLE = process.env.PLAYER_POINTS_TABLE;
+                playerPointsID = event.pathParameters.ID;
+                params = {
+                    TableName: PLAYER_POINTS_TABLE,
+                    Key: {
+                        ID: playerPointsID
+                    }
+                };
+                return [4 /*yield*/, services_1.dynamoDBService.getPoints(params)];
+            case 1:
+                results = _a.sent();
+                return [2 /*return*/, apiResult({
+                        statusCode: 200,
+                        body: results
+                    })];
+            case 2:
+                error_2 = _a.sent();
+                return [2 /*return*/, handleError(error_2)];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); };
+exports.getPoints = getPoints;
 var handleError = function (error) {
     // Log.error(error.message || "error: ", error);
     return apiResult({ statusCode: error["statusCode"] || 500, body: {

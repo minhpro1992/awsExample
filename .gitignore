@@ -5,3 +5,4 @@ node_modules
 yarn-error.log
 .build/handler.js
 .build/handler.js.map
+.serverless/serverless.zip
