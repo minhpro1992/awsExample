@@ -90,12 +90,21 @@ functions:
           cors:
             origin: ${env:CORS_ORIGIN, '*'}
             maxAge: 3600
-  getPoints:
-    handler: handler.getPoints
+  getPoint:
+    handler: handler.getPoint
     events:
       - httpApi:
         method: get
         path: /players-points/{ID}
+        cors:
+          origin: ${env:CORS_ORIGIN, '*'}
+          maxAge: 3600
+  createPoint:
+    handler: handler.createPoint
+    events:
+      - httpApi:
+        method: post
+        path: /players-points
         cors:
           origin: ${env:CORS_ORIGIN, '*'}
           maxAge: 3600

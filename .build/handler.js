@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPoints = exports.getS3PresignedURL = exports.getS3PostPresignedUploadFile = exports.hello = void 0;
+exports.createPoint = exports.getPoint = exports.getS3PresignedURL = exports.getS3PostPresignedUploadFile = exports.hello = void 0;
 var bucket_type_1 = require("./enums/bucket-type");
 var services_1 = require("./services");
 var apiResult = function (_a) {
@@ -130,7 +130,7 @@ var getS3PresignedURL = function (event) { return __awaiter(void 0, void 0, void
     });
 }); };
 exports.getS3PresignedURL = getS3PresignedURL;
-var getPoints = function (event) { return __awaiter(void 0, void 0, void 0, function () {
+var getPoint = function (event) { return __awaiter(void 0, void 0, void 0, function () {
     var PLAYER_POINTS_TABLE, playerPointsID, params, results, error_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -144,7 +144,7 @@ var getPoints = function (event) { return __awaiter(void 0, void 0, void 0, func
                         ID: playerPointsID
                     }
                 };
-                return [4 /*yield*/, services_1.dynamoDBService.getPoints(params)];
+                return [4 /*yield*/, services_1.dynamoDBService.getPoint(params)];
             case 1:
                 results = _a.sent();
                 return [2 /*return*/, apiResult({
@@ -158,7 +158,44 @@ var getPoints = function (event) { return __awaiter(void 0, void 0, void 0, func
         }
     });
 }); };
-exports.getPoints = getPoints;
+exports.getPoint = getPoint;
+var createPoint = function (event) { return __awaiter(void 0, void 0, void 0, function () {
+    var PLAYER_POINTS_TABLE, firstName, lastName, age, ID, params, results, error_3;
+    var _a, _b, _c, _d;
+    return __generator(this, function (_e) {
+        switch (_e.label) {
+            case 0:
+                _e.trys.push([0, 2, , 3]);
+                PLAYER_POINTS_TABLE = process.env.PLAYER_POINTS_TABLE;
+                firstName = (_a = event.body) === null || _a === void 0 ? void 0 : _a.firstName;
+                lastName = (_b = event.body) === null || _b === void 0 ? void 0 : _b.lastName;
+                age = (_c = event.body) === null || _c === void 0 ? void 0 : _c.age;
+                ID = (_d = event.body) === null || _d === void 0 ? void 0 : _d.ID;
+                params = {
+                    TableName: PLAYER_POINTS_TABLE,
+                    Item: {
+                        ID: ID,
+                        firstName: firstName,
+                        lastName: lastName,
+                        age: age
+                    }
+                };
+                console.log(params);
+                return [4 /*yield*/, services_1.dynamoDBService.createPoint(params)];
+            case 1:
+                results = _e.sent();
+                return [2 /*return*/, apiResult({
+                        statusCode: 200,
+                        body: results
+                    })];
+            case 2:
+                error_3 = _e.sent();
+                return [2 /*return*/, handleError(error_3)];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); };
+exports.createPoint = createPoint;
 var handleError = function (error) {
     // Log.error(error.message || "error: ", error);
     return apiResult({ statusCode: error["statusCode"] || 500, body: {

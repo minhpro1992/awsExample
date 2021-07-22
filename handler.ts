@@ -10,6 +10,7 @@ import {
 } from "aws-lambda";
 import { dynamoDBService, s3Service } from "./services";
 import { GetItemInput } from "aws-sdk/clients/dynamodb";
+import { PointType } from "./types";
 const apiResult = ({statusCode, body} : {statusCode: number, body: unknown}) => {
   return {
     statusCode,
@@ -94,7 +95,7 @@ export const getS3PresignedURL: Handler = async (
   }
 };
 
-export const getPoints: Handler = async (event: APIGatewayProxyEvent) => {
+export const getPoint: Handler = async (event: APIGatewayProxyEvent) => {
   try {
     const PLAYER_POINTS_TABLE = process.env.PLAYER_POINTS_TABLE
     const playerPointsID = event.pathParameters.ID
@@ -104,11 +105,40 @@ export const getPoints: Handler = async (event: APIGatewayProxyEvent) => {
         ID: playerPointsID
       }
     }
-    const results = await dynamoDBService.getPoints(params as GetItemInput)
+    if(!playerPointsID) return apiResult({ statusCode: 400, body: 'ID is required'})
+    const results = await dynamoDBService.getPoint(params)
     return apiResult({
       statusCode: 200,
       body: results
     })
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
+export const createPoint: Handler = async (event: APIGatewayProxyEvent) => {
+  try {
+    const PLAYER_POINTS_TABLE = process.env.PLAYER_POINTS_TABLE
+    const body = event.body as unknown as PointType
+    const firstName = body?.firstName
+    const lastName = body?.lastName
+    const age = body?.age
+    const ID = body?.ID
+  const params = {
+    TableName: PLAYER_POINTS_TABLE,
+    Item: {
+      ID,
+      firstName,
+      lastName,
+      age
+    }
+  }
+  if(!ID) return apiResult({statusCode: 400, body: 'ID is required'})
+  const results = await dynamoDBService.createPoint(params)
+   return apiResult({
+     statusCode: 200,
+     body: results
+   })
   } catch (error) {
     return handleError(error)
   }
