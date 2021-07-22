@@ -144,6 +144,8 @@ var getPoint = function (event) { return __awaiter(void 0, void 0, void 0, funct
                         ID: playerPointsID
                     }
                 };
+                if (!playerPointsID)
+                    return [2 /*return*/, apiResult({ statusCode: 400, body: 'ID is required' })];
                 return [4 /*yield*/, services_1.dynamoDBService.getPoint(params)];
             case 1:
                 results = _a.sent();
@@ -160,17 +162,17 @@ var getPoint = function (event) { return __awaiter(void 0, void 0, void 0, funct
 }); };
 exports.getPoint = getPoint;
 var createPoint = function (event) { return __awaiter(void 0, void 0, void 0, function () {
-    var PLAYER_POINTS_TABLE, firstName, lastName, age, ID, params, results, error_3;
-    var _a, _b, _c, _d;
-    return __generator(this, function (_e) {
-        switch (_e.label) {
+    var PLAYER_POINTS_TABLE, body, firstName, lastName, age, ID, params, results, error_3;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
             case 0:
-                _e.trys.push([0, 2, , 3]);
+                _a.trys.push([0, 2, , 3]);
                 PLAYER_POINTS_TABLE = process.env.PLAYER_POINTS_TABLE;
-                firstName = (_a = event.body) === null || _a === void 0 ? void 0 : _a.firstName;
-                lastName = (_b = event.body) === null || _b === void 0 ? void 0 : _b.lastName;
-                age = (_c = event.body) === null || _c === void 0 ? void 0 : _c.age;
-                ID = (_d = event.body) === null || _d === void 0 ? void 0 : _d.ID;
+                body = event.body;
+                firstName = body === null || body === void 0 ? void 0 : body.firstName;
+                lastName = body === null || body === void 0 ? void 0 : body.lastName;
+                age = body === null || body === void 0 ? void 0 : body.age;
+                ID = body === null || body === void 0 ? void 0 : body.ID;
                 params = {
                     TableName: PLAYER_POINTS_TABLE,
                     Item: {
@@ -180,16 +182,17 @@ var createPoint = function (event) { return __awaiter(void 0, void 0, void 0, fu
                         age: age
                     }
                 };
-                console.log(params);
+                if (!ID)
+                    return [2 /*return*/, apiResult({ statusCode: 400, body: 'ID is required' })];
                 return [4 /*yield*/, services_1.dynamoDBService.createPoint(params)];
             case 1:
-                results = _e.sent();
+                results = _a.sent();
                 return [2 /*return*/, apiResult({
                         statusCode: 200,
                         body: results
                     })];
             case 2:
-                error_3 = _e.sent();
+                error_3 = _a.sent();
                 return [2 /*return*/, handleError(error_3)];
             case 3: return [2 /*return*/];
         }

@@ -7,7 +7,7 @@ export const getPoint = async (params: {
         ID: string
     }
 }) => {
-    if(params?.TableName) {
+    if(params?.TableName && params.Key?.ID) {
         return getDynamoDBClient().get(params).promise()
     }
     return null
