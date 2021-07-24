@@ -108,6 +108,15 @@ functions:
         cors:
           origin: ${env:CORS_ORIGIN, '*'}
           maxAge: 3600
+  updatePoint:
+    handler: handler.updatePoint
+    events:
+      - httpApi:
+        method: patch
+        path: /players-points
+        cors:
+          origin: '*'
+          maxAge: 3600
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details

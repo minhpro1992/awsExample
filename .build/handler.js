@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createPoint = exports.getPoint = exports.getS3PresignedURL = exports.getS3PostPresignedUploadFile = exports.hello = void 0;
+exports.updatePoint = exports.createPoint = exports.getPoint = exports.getS3PresignedURL = exports.getS3PostPresignedUploadFile = exports.hello = void 0;
 var bucket_type_1 = require("./enums/bucket-type");
 var services_1 = require("./services");
 var apiResult = function (_a) {
@@ -199,6 +199,47 @@ var createPoint = function (event) { return __awaiter(void 0, void 0, void 0, fu
     });
 }); };
 exports.createPoint = createPoint;
+var updatePoint = function (event) { return __awaiter(void 0, void 0, void 0, function () {
+    var PLAYER_POINTS_TABLE, body, ID, firstName, lastName, age, params, response, error_4;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                PLAYER_POINTS_TABLE = process.env.PLAYER_POINTS_TABLE;
+                body = event.body;
+                ID = body.ID;
+                firstName = body.firstName;
+                lastName = body.lastName;
+                age = body.age;
+                params = {
+                    TableName: PLAYER_POINTS_TABLE,
+                    Key: { ID: ID },
+                    UpdateExpression: 'set firstName=:firstName, lastName=:lastName, age=:age',
+                    ConditionExpression: 'ID=:ID',
+                    ExpressionAttributeValues: {
+                        ':ID': ID,
+                        ':firstName': firstName,
+                        ':lastName': lastName,
+                        ':age': age
+                    }
+                };
+                if (!ID)
+                    return [2 /*return*/, apiResult({ statusCode: 400, body: 'ID is required' })];
+                return [4 /*yield*/, services_1.dynamoDBService.updatePoint(params)];
+            case 1:
+                response = _a.sent();
+                return [2 /*return*/, apiResult({
+                        statusCode: 200,
+                        body: response
+                    })];
+            case 2:
+                error_4 = _a.sent();
+                return [2 /*return*/, handleError(error_4)];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); };
+exports.updatePoint = updatePoint;
 var handleError = function (error) {
     // Log.error(error.message || "error: ", error);
     return apiResult({ statusCode: error["statusCode"] || 500, body: {
