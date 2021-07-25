@@ -11,6 +11,7 @@ import {
 import { dynamoDBService, s3Service } from "./services";
 import { GetItemInput, QueryInput, UpdateItemInput } from "aws-sdk/clients/dynamodb";
 import { PointType } from "./types";
+import { WorkBook } from "xlsx/types";
 const apiResult = ({statusCode, body} : {statusCode: number, body: unknown}) => {
   return {
     statusCode,
@@ -94,6 +95,24 @@ export const getS3PresignedURL: Handler = async (
     // Log.debug("Finished-getS3PresignedURL");
   }
 };
+
+export const getWorkbookFromS3: Handler = async(event: APIGatewayProxyEvent) => {
+  try {
+    const { bucketType, fileName } = event.queryStringParameters;
+    const bucketName = BucketType.fromType(bucketType as unknown as number)?.bucketName;
+    const workbook = await s3Service.getWorkbookFromS3({
+      bucketName,
+      fileName
+    })
+    await s3Service.writeWorkBookToS3({
+      bucketName,
+      objectKey: `${fileName}-dev`,
+      workBook: workbook as WorkBook
+    })
+  } catch (error) {
+    return handleError(error)
+  }
+}
 
 export const getPoint: Handler = async (event: APIGatewayProxyEvent) => {
   try {

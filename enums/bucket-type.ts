@@ -5,6 +5,12 @@ class BucketType {
         'image/',
         [0,10]
     )
+    public static readonly BUCKET_CSV_FILE = new BucketType(
+        1,
+        process.env.BUCKET_NAME,
+        'application/octet-stream',
+        [0,50]
+    )
     private constructor (
         public readonly type: number,
         public readonly bucketName: string,
@@ -13,7 +19,8 @@ class BucketType {
 
     ){}
     public static readonly ALL_BUCKETS: BucketType[] = [
-        BucketType.BUCKET_IMAGE
+        BucketType.BUCKET_IMAGE,
+        BucketType.BUCKET_CSV_FILE
     ]
 
     static fromType = (type: number): BucketType => {

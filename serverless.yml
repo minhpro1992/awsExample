@@ -126,6 +126,14 @@ functions:
         cors:
           origin: '*'
           maxAge: 3600
+  getWorkbookFromS3:
+    handler: handler.getWorkbookFromS3
+    events:
+      - httpApi:
+        method: get
+        path: /get-workbook
+        cors: '*'
+        maxAge: 3600
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
