@@ -9,7 +9,7 @@ import {
   APIGatewayProxyResult,
 } from "aws-lambda";
 import { dynamoDBService, s3Service } from "./services";
-import { GetItemInput, UpdateItemInput } from "aws-sdk/clients/dynamodb";
+import { GetItemInput, QueryInput, UpdateItemInput } from "aws-sdk/clients/dynamodb";
 import { PointType } from "./types";
 const apiResult = ({statusCode, body} : {statusCode: number, body: unknown}) => {
   return {
@@ -174,6 +174,31 @@ export const updatePoint: Handler = async (event: APIGatewayProxyEvent) => {
     return handleError(error)
   }
 }
+
+export const getPointsByType: Handler = async (event: APIGatewayProxyEvent) => {
+  try {
+    const PLAYER_POINTS_TABLE = process.env.PLAYER_POINTS_TABLE
+    const type = event.pathParameters?.type && Number(event.pathParameters.type)
+    console.log('type: ',type)
+    if(type < 0)  return apiResult({statusCode: 400, body: 'Type is required'})
+    const params = {
+      TableName: PLAYER_POINTS_TABLE,
+      IndexName: 'player_point_type_index',
+      KeyConditionExpression: '#type=:type',
+      ExpressionAttributeValues: {
+        ':type': type
+      },
+      ExpressionAttributeNames: {
+        '#type': 'type'
+      }
+    }
+    const response = await dynamoDBService.getPointsByType(params as QueryInput)
+    return apiResult({statusCode: 200, body: response})
+  } catch (error) {
+    return handleError(error)
+  }
+}
+
 const handleError = (error: Error) => {
   // Log.error(error.message || "error: ", error);
   return apiResult({statusCode : error["statusCode"] || 500, body: {

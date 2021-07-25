@@ -117,6 +117,15 @@ functions:
         cors:
           origin: '*'
           maxAge: 3600
+  getPointsByType:
+    handler: handler.getPointsByType
+    events:
+      - httpApi:
+        method: get
+        path: /players-points/{type}
+        cors:
+          origin: '*'
+          maxAge: 3600
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
@@ -168,3 +177,42 @@ functions:
 #     NewOutput:
 #       Description: "Description for the output"
 #       Value: "Some output value"
+resources:
+  Resources:
+    playerPointsTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: ID
+            AttributeType: S
+          - AttributeName: type
+            AttributeType: N
+          - AttributeName: firstName
+            AttributeType: S
+          - AttributeName: lastName
+            AttributeType: S
+          - AttributeName: age
+            AttributeType: N
+        KeySchema:
+          - AttributeName: ID
+            KeyType: HASH
+          - AttributeName: type
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:custom.DYNAMODB.TableName}-dev
+        Tags:
+          - Key: heritage
+            Value: serverless
+        GlobalSecondaryIndexes:
+          - IndexName: player_point_type_index
+            KeySchema:
+              - AttributeName: ID
+                KeyType: HASH
+              - AttributeName: type
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+  Outputs:
+    playerPointsRN:
+      Description: "Description for the output"
+      Value: !Ref playerPointsTable

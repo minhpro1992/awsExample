@@ -1,4 +1,4 @@
-import { UpdateItemInput } from "aws-sdk/clients/dynamodb";
+import { QueryInput, UpdateItemInput } from "aws-sdk/clients/dynamodb";
 import { getDynamoDBClient } from "../dynamoDB/dynamoDB-client";
 import { PointType } from "../types";
 
@@ -27,6 +27,13 @@ export const createPoint = async (params: {
 export const updatePoint = async (params: UpdateItemInput) => {
     if(params?.TableName) {
         return getDynamoDBClient().update(params).promise()
+    }
+    return null
+}
+
+export const getPointsByType = async (params: QueryInput) => {
+    if(params?.TableName) {
+        return await getDynamoDBClient().query(params).promise()
     }
     return null
 }
