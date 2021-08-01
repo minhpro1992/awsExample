@@ -1,0 +1,1 @@
+export * as DynamoDBRepository from './dynamoDB.repository'

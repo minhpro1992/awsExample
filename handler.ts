@@ -118,14 +118,11 @@ export const getPoint: Handler = async (event: APIGatewayProxyEvent) => {
   try {
     const PLAYER_POINTS_TABLE = process.env.PLAYER_POINTS_TABLE
     const playerPointsID = event.pathParameters.ID
-    const params = {
-      TableName: PLAYER_POINTS_TABLE,
-      Key: {
-        ID: playerPointsID
-      }
-    }
     if(!playerPointsID) return apiResult({ statusCode: 400, body: 'ID is required'})
-    const results = await dynamoDBService.getPoint(params)
+    const results = await dynamoDBService.getPoint({
+      TableName: PLAYER_POINTS_TABLE,
+      ID: playerPointsID
+    })
     return apiResult({
       statusCode: 200,
       body: results
@@ -139,21 +136,11 @@ export const createPoint: Handler = async (event: APIGatewayProxyEvent) => {
   try {
     const PLAYER_POINTS_TABLE = process.env.PLAYER_POINTS_TABLE
     const body = event.body as unknown as PointType
-    const firstName = body?.firstName
-    const lastName = body?.lastName
-    const age = body?.age
-    const ID = body?.ID
-  const params = {
-    TableName: PLAYER_POINTS_TABLE,
-    Item: {
-      ID,
-      firstName,
-      lastName,
-      age
-    }
-  }
-  if(!ID) return apiResult({statusCode: 400, body: 'ID is required'})
-  const results = await dynamoDBService.createPoint(params)
+    if(!body?.ID) return apiResult({statusCode: 400, body: 'ID is required'})
+    const results = await dynamoDBService.createPoint({
+      body,
+      TableName: PLAYER_POINTS_TABLE
+    })
    return apiResult({
      statusCode: 200,
      body: results
@@ -167,24 +154,11 @@ export const updatePoint: Handler = async (event: APIGatewayProxyEvent) => {
   try {
     const PLAYER_POINTS_TABLE = process.env.PLAYER_POINTS_TABLE
     const body = event.body as unknown as PointType
-    const ID = body.ID
-    const firstName = body.firstName
-    const lastName = body.lastName
-    const age = body.age
-    const params = {
+    if(!body?.ID) return apiResult({ statusCode: 400, body: 'ID is required'})
+    const response = await dynamoDBService.updatePoint({
       TableName: PLAYER_POINTS_TABLE,
-      Key: {ID},
-      UpdateExpression: 'set firstName=:firstName, lastName=:lastName, age=:age',
-      ConditionExpression: 'ID=:ID',
-      ExpressionAttributeValues: {
-        ':ID': ID,
-        ':firstName': firstName,
-        ':lastName': lastName,
-        ':age': age
-      }
-    }
-    if(!ID) return apiResult({ statusCode: 400, body: 'ID is required'})
-    const response = await dynamoDBService.updatePoint(params as UpdateItemInput)
+      body
+    })
     return apiResult({
       statusCode: 200,
       body: response
@@ -200,18 +174,10 @@ export const getPointsByType: Handler = async (event: APIGatewayProxyEvent) => {
     const type = event.pathParameters?.type && Number(event.pathParameters.type)
     console.log('type: ',type)
     if(type < 0)  return apiResult({statusCode: 400, body: 'Type is required'})
-    const params = {
+    const response = await dynamoDBService.getPointsByType({
       TableName: PLAYER_POINTS_TABLE,
-      IndexName: 'player_point_type_index',
-      KeyConditionExpression: '#type=:type',
-      ExpressionAttributeValues: {
-        ':type': type
-      },
-      ExpressionAttributeNames: {
-        '#type': 'type'
-      }
-    }
-    const response = await dynamoDBService.getPointsByType(params as QueryInput)
+      type
+    })
     return apiResult({statusCode: 200, body: response})
   } catch (error) {
     return handleError(error)

@@ -1,39 +1,76 @@
-import { QueryInput, UpdateItemInput } from "aws-sdk/clients/dynamodb";
+import { GetItemInput, PutItemInput, QueryInput, UpdateItemInput } from "aws-sdk/clients/dynamodb";
 import { getDynamoDBClient } from "../dynamoDB/dynamoDB-client";
+import { DynamoDBRepository } from "../repositories";
 import { PointType } from "../types";
 
-export const getPoint = async (params: {
-    TableName: string,
-    Key: {
-        ID: string
-    }
+export const getPoint = async ({TableName, ID}: {TableName: string, ID: string
 }) => {
-    if(params?.TableName && params.Key?.ID) {
-        return getDynamoDBClient().get(params).promise()
+    const params = {
+      TableName,
+      Key: {
+        ID
+      }
     }
-    return null
+    return DynamoDBRepository.getPoint(params as GetItemInput)
 }
 
-export const createPoint = async (params: {
+export const createPoint = async ({TableName, body}: {
     TableName: string,
-    Item: PointType
+    body: PointType
 }) => {
-    if(params?.TableName) {
-        return getDynamoDBClient().put(params).promise()
+    const firstName = body?.firstName
+    const lastName = body?.lastName
+    const age = body?.age
+    const ID = body?.ID
+    const params = {
+        TableName,
+        Item: {
+            ID,
+            firstName,
+            lastName,
+            age
+        }
     }
-    return null
+    return DynamoDBRepository.createPoint(params as PutItemInput)
 }
 
-export const updatePoint = async (params: UpdateItemInput) => {
-    if(params?.TableName) {
-        return getDynamoDBClient().update(params).promise()
+export const updatePoint = async ({
+    TableName,
+    body
+}: {
+    TableName:string,
+    body: PointType
+}) => {
+    const ID = body.ID
+    const firstName = body.firstName
+    const lastName = body.lastName
+    const age = body.age
+    const params = {
+      TableName,
+      Key: {ID},
+      UpdateExpression: 'set firstName=:firstName, lastName=:lastName, age=:age',
+      ConditionExpression: 'ID=:ID',
+      ExpressionAttributeValues: {
+        ':ID': ID,
+        ':firstName': firstName,
+        ':lastName': lastName,
+        ':age': age
+      }
     }
-    return null
+    return DynamoDBRepository.updatePoint(params as UpdateItemInput)
 }
 
-export const getPointsByType = async (params: QueryInput) => {
-    if(params?.TableName) {
-        return await getDynamoDBClient().query(params).promise()
+export const getPointsByType = async ({TableName, type}: {TableName: string, type: number}) => {
+    const params = {
+      TableName,
+      IndexName: 'player_point_type_index',
+      KeyConditionExpression: '#type=:type',
+      ExpressionAttributeValues: {
+        ':type': type
+      },
+      ExpressionAttributeNames: {
+        '#type': 'type'
+      }
     }
-    return null
+    return DynamoDBRepository.getPointsByType(params as QueryInput)
 }
