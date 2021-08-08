@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+      "allowJs": true,
+      "esModuleInterop": true,
+      "forceConsistentCasingInFileNames": true,
+      "moduleResolution": "node",
+      "noImplicitThis": true,
+      "noUnusedLocals": true,
+      "noUnusedParameters": true,
+      "outDir": ".build",
+      "preserveConstEnums": true,
+      "removeComments": true,
+      "rootDir": "./",
+      "sourceMap": true,
+      "suppressImplicitAnyIndexErrors": true,
+      "target": "es6",
+      "module": "commonjs",
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true
+    }
+  }
+  

@@ -57,6 +57,26 @@ custom:
     TableName: 'player-points'
   S3:
     BUCKET_NAME: 'uploadfilename'
+  documentation:
+    api:
+      info:
+        version: "1"
+        title: "AWS example APIs"
+        description: "AWS example APIs"
+        contact:
+          name: ""
+          url: ""
+          email: "minhdev48@gmail.com"
+    tags:
+      - name: "AWS example API"
+        description: "AWS example API"
+    models:
+      - name: Response
+        contentType: "application/json"
+        schema: ${file(.schema/response.json)}
+      - name: ErrorResponse
+        contentType: "application/json"
+        schema: ${file(.schema/error.json)}
 # you can overwrite defaults here
   # stage: dev
   # region: ap-southeast-1
@@ -152,6 +172,14 @@ functions:
       - httpApi:
         method: get
         path: /get-workbook
+        cors: '*'
+        maxAge: 3600
+  checkConnectDB:
+    handler: handler.checkConnectDB
+    events:
+      - httpApi:
+        method: get
+        path: /check-connect-db
         cors: '*'
         maxAge: 3600
 #    The following are a few example events you can configure

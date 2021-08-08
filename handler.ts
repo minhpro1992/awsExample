@@ -12,6 +12,8 @@ import { dynamoDBService, s3Service } from "./services";
 import { GetItemInput, QueryInput, UpdateItemInput } from "aws-sdk/clients/dynamodb";
 import { PointType } from "./types";
 import { WorkBook } from "xlsx/types";
+import { sequelize } from "./sequelize";
+import { Person } from "./models";
 const apiResult = ({statusCode, body} : {statusCode: number, body: unknown}) => {
   return {
     statusCode,
@@ -180,6 +182,17 @@ export const getPointsByType: Handler = async (event: APIGatewayProxyEvent) => {
     })
     return apiResult({statusCode: 200, body: response})
   } catch (error) {
+    return handleError(error)
+  }
+}
+
+export const checkConnectDB:Handler = async (event: APIGatewayProxyEvent) => {
+  try {
+    await sequelize()
+    const response= await Person.count()
+    console.log('response:', response)
+  } catch (error) {
+    console.log('error:', error)
     return handleError(error)
   }
 }
